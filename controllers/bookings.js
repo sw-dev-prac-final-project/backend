@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking');
 const Company = require('../models/Company');
+const sendConfirmationEmail = require("../utils/email");
 
 exports.getBookings = async (req, res,next) => {
     let query;
@@ -94,6 +95,9 @@ exports.addBooking = async (req, res, next) => {
             }
         });
         const booking = await Booking.create(sanitizedBody);
+        //send confirmation email
+        await sendConfirmationEmail(req.user.email, req.user.name, booking, company);
+
         return res.status(201).json({
             success: true,
             data: booking,
