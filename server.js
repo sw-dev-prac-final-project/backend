@@ -31,14 +31,14 @@ app.use(cookieParser());
 
 // security
 // Sanitize data
-app.use(
-    mongoSanitize({
-      onSanitize: ({ req, key }) => {
-        console.warn(`This request's ${key} is sanitized`, req[key]);
-      },
-      replaceWith: '_', // Replace prohibited characters with an underscore
-    })
-  );
+// app.use(
+//     mongoSanitize({
+//       onSanitize: ({ req, key }) => {
+//         console.warn(`This request's ${key} is sanitized`, req[key]);
+//       },
+//       replaceWith: '_', // Replace prohibited characters with an underscore
+//     })
+//   );
 app.use(helmet());
 app.use(xss());
 const limiter = rateLimit({
