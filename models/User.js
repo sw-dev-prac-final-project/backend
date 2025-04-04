@@ -28,7 +28,8 @@ const UserSchema = new mongoose.Schema({
     tel:{
         type:String,
         required:[true,'Please add an telephone number'],
-        length:10,
+        minlength:9,
+        maxlength:10,
         validate: {
             validator: function (v) {
               return /^\d{10}$/.test(v); // Exactly 10 digits

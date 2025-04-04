@@ -68,9 +68,9 @@ exports.getCompanies = async (req, res) => {
 
 exports.getCompany=async (req,res,next) => {
     try{
-        const company = await Company.findById(req.params.id);
+        const company = await Company.findById(req.params.companyID);
         if(!company){
-            return res.status(400).json({success:false,message:`Company not found with id of ${req.params.id}`});
+            return res.status(400).json({success:false,message:`Company not found with companyID of ${req.params.id}`});
         }
         res.status(200).json({
             success:true, data:company
@@ -125,7 +125,7 @@ exports.deleteCompany = async (req, res, next) => {
     }
   
        // Delete all bookings related to this hospital
-       await Company.deleteMany({ company: req.params.id });
+       await Booking.deleteMany({ company: req.params.id });
   
        // Delete the hospital itself
        await Company.deleteOne({ _id: req.params.id });
