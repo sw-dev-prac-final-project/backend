@@ -102,3 +102,12 @@ exports.logout  = async (req, res, next) => {
     data: {},
   });
 }
+
+exports.updateProfile = async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  sendTokenResponse(user, 200, res);
+}

@@ -65,7 +65,7 @@ exports.getBooking = async (req, res, next) => {
     }
 }
 
-exports.createBooking = async (req, res, next) => {
+exports.addBooking = async (req, res, next) => {
     try{
         req.body.company = req.params.companyID;
 
@@ -82,7 +82,7 @@ exports.createBooking = async (req, res, next) => {
         if(existedBooking >= 3 && req.user.role != 'admin'){
             return res.status(400).json({
                 success: false,
-                message: `The user with ID ${req.user.id} has already made 3 appointments.`,
+                message: `The user with ID ${req.user.id} has already made 3 bookings.`,
             });
         }
 

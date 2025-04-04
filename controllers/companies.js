@@ -14,7 +14,7 @@ exports.getCompanies = async (req, res) => {
         let queryStr = JSON.stringify(reqQuery);
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
-        query = Hospital.find(JSON.parse(queryStr)).populate('bookings');
+        query = Company.find(JSON.parse(queryStr)).populate('bookings');
 
         if (req.query.select) {
             const fields = req.query.select.split(',').join(' ');
@@ -80,7 +80,7 @@ exports.getCompany=async (req,res,next) => {
     }
 };
 
-exports.createCompany=async (req,res,next) => {
+exports.addCompany=async (req,res,next) => {
     const company =await Company.create(req.body);
     res.status(201).json({
         success:true, 
@@ -116,7 +116,7 @@ exports.deleteCompany = async (req, res, next) => {
         });
     }
   
-       // Delete all appointments related to this hospital
+       // Delete all bookings related to this hospital
        await Company.deleteMany({ company: req.params.id });
   
        // Delete the hospital itself
