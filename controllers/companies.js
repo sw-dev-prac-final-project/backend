@@ -70,7 +70,7 @@ exports.getCompany=async (req,res,next) => {
     try{
         const company = await Company.findById(req.params.id);
         if(!company){
-            return res.status(400).json({success:false});
+            return res.status(400).json({success:false,message:`Company not found with id of ${req.params.id}`});
         }
         res.status(200).json({
             success:true, data:company
@@ -81,11 +81,19 @@ exports.getCompany=async (req,res,next) => {
 };
 
 exports.addCompany=async (req,res,next) => {
-    const company =await Company.create(req.body);
-    res.status(201).json({
-        success:true, 
-        data:company
-    });
+    try{
+        const company =await Company.create(req.body);
+        res.status(201).json({
+            success:true, 
+            data:company
+        });
+    }catch(err){
+        if(err.code === 11000) {
+            return res.status(400).json({ success: false, msg: `Company already exists` });
+        }
+        res.status(400).json({ success: false });
+        console.log(err.stack);
+    }
 };
 
 exports.updateCompany=async (req,res,next) => {
