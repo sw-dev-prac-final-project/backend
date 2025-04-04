@@ -67,17 +67,17 @@ exports.getBooking = async (req, res, next) => {
 
 exports.addBooking = async (req, res, next) => {
     try{
-        req.body.company = req.params.companyID;
+        const companyID = req.body.company;
 
-        const company = await Company.findById(req.params.companyID);
+        const company = await Company.findById(companyID);
         if(!company){
             return res.status(404).json({
                 success: false,
                 error: 'No company found',
             });
         }
-        req.body.user = req.user.id;
-        const existedBooking = await Booking.findOne({user:req.user.id});
+        const userId = req.user.id;
+        const existedBooking = await Booking.find({user:userId});
 
         if(existedBooking >= 3 && req.user.role != 'admin'){
             return res.status(400).json({
@@ -85,7 +85,7 @@ exports.addBooking = async (req, res, next) => {
                 message: `The user with ID ${req.user.id} has already made 3 bookings.`,
             });
         }
-
+        
         const booking = await Booking.create(req.body);
         return res.status(201).json({
             success: true,
