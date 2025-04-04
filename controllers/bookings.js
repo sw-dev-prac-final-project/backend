@@ -5,8 +5,8 @@ exports.getBookings = async (req, res,next) => {
     let query;
 
     if(req.user.role!='admin'){
-        query = Company.find({user:req.user.id}).populate({
-            path:'bookings',
+        query = Booking.find({user:req.user.id}).populate({
+            path:'company',
             select:'name address tel website',
         }); 
     }else{
