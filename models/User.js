@@ -6,11 +6,11 @@ const jwt = require('jsonwebtoken');
 const UserSchema = new mongoose.Schema({
     name:{
         type:String,
-        require:[true,'Please add a name']
+        required:[true,'Please add a name']
     },
     email:{
         type:String,
-        require:[true,'Please add an email'],
+        required:[true,'Please add an email'],
         unique : true,
 
     },
@@ -27,7 +27,7 @@ const UserSchema = new mongoose.Schema({
     },
     tel:{
         type:String,
-        require:[true,'Please add an telephone number'],
+        required:[true,'Please add an telephone number'],
         length:10,
         validate: {
             validator: function (v) {
