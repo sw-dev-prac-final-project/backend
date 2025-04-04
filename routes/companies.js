@@ -1,4 +1,4 @@
-express = require("express");
+const express = require("express");
 const { getCompanies, getCompany, addCompany, updateCompany, deleteCompany } = require("../controllers/companies");
 
 const { protect, authorize } = require("../middleware/auth");      

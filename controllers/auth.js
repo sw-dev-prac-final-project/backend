@@ -26,11 +26,12 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, number, email, password, role } = req.body;
 
     //create user
     const user = await User.create({
       name,
+      number,
       email,
       password,
       role,
