@@ -1,12 +1,13 @@
 const Booking = require('../models/Booking');
 const Company = require('../models/Company');
+const sendConfirmationEmail = require("../utils/email");
 
 exports.getBookings = async (req, res,next) => {
     let query;
 
     if(req.user.role!='admin'){
-        query = Company.find({user:req.user.id}).populate({
-            path:'bookings',
+        query = Booking.find({user:req.user.id}).populate({
+            path:'company',
             select:'name address tel website',
         }); 
     }else{
@@ -106,8 +107,13 @@ exports.addBooking = async (req, res, next) => {
             }
         });
         const booking = await Booking.create(sanitizedBody);
+
         company.bookedTime.push(booking.apptDate);
         await company.save();
+
+        //send confirmation email
+        await sendConfirmationEmail(req.user.email, req.user.name, booking, company);
+
         return res.status(201).json({
             success: true,
             data: booking,
