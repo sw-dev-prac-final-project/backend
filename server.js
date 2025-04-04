@@ -21,6 +21,7 @@ connectDB();
 const companies = require("./routes/companies");
 const bookings = require('./routes/bookings')
 const auth = require("./routes/auth");
+const { mongo } = require("mongoose");
 
 const app = express();
 app.use(cors());
@@ -28,8 +29,16 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-//security
-app.use(mongoSanitize());
+// security
+// Sanitize data
+app.use(
+    mongoSanitize({
+      onSanitize: ({ req, key }) => {
+        console.warn(`This request's ${key} is sanitized`, req[key]);
+      },
+      replaceWith: '_', // Replace prohibited characters with an underscore
+    })
+  );
 app.use(helmet());
 app.use(xss());
 const limiter = rateLimit({
