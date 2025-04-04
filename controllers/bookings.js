@@ -154,7 +154,8 @@ exports.deleteBooking = async (req, res, next) => {
                 error: 'Not authorized to delete this booking',
             });
         }
-        await booking.remove();
+        await Booking.deleteOne({ _id: req.params.id });
+        
         return res.status(200).json({
             success: true,
             data: {},
