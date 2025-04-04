@@ -76,6 +76,18 @@ exports.addBooking = async (req, res, next) => {
                 error: 'No company found',
             });
         }
+
+        // Extract apptDate from req.body
+        const apptDate = req.body.apptDate;
+
+        // Check if the appointment date already exists in the company's bookedTime
+        if (company.bookedTime.includes(apptDate)) {
+            return res.status(400).json({
+                success: false,
+                message: `The appointment date ${apptDate} is already booked for this company.`,
+            });
+        }
+
         const userId = req.user.id;
         const existedBooking = await Booking.find({user:userId});
 
@@ -94,6 +106,8 @@ exports.addBooking = async (req, res, next) => {
             }
         });
         const booking = await Booking.create(sanitizedBody);
+        company.bookedTime.push(booking.apptDate);
+        await company.save();
         return res.status(201).json({
             success: true,
             data: booking,
@@ -116,16 +130,57 @@ exports.updateBooking = async (req, res, next) => {
                 error: 'No booking found',
             });
         }
+
         if (booking.user.toString() !== req.user.id && req.user.role !== 'admin') {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to update this booking',
             });
         }
-        booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
+
+        // Store the old appointment date and company before making any changes
+        const oldApptDate = booking.apptDate;
+        const oldCompany = await Company.findById(booking.company);
+
+        // Check if a new apptDate is provided and if the new apptDate is already booked for the new company
+        const newApptDate = req.body.apptDate;
+        let newCompany = null;
+
+        if (newApptDate) {
+            newCompany = await Company.findById(req.body.company);
+
+            if (newCompany) {
+                // Check if the new apptDate is already taken by the new company
+                if (newCompany.bookedTime.includes(newApptDate)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `The appointment date ${newApptDate} is already booked for this company.`,
+                    });
+                }
+            }
+        }
+
+        // If the apptDate is being updated or if the company is being changed, remove the old apptDate from the old company
+        if (oldCompany && oldApptDate) {
+            oldCompany.bookedTime = oldCompany.bookedTime.filter(
+                date => date.toISOString() !== oldApptDate.toISOString()
+            );
+            await oldCompany.save();
+        }
+
+        // Update the booking with the new data
+        const updatedData = req.body;
+        booking = await Booking.findByIdAndUpdate(req.params.id, updatedData, {
             new: true,
             runValidators: true,
         });
+
+        // If the appointment date or company was changed, add the new apptDate to the new company's bookedTime
+        if (newCompany && newApptDate) {
+            newCompany.bookedTime.push(newApptDate);
+            await newCompany.save();
+        }
+
         return res.status(200).json({
             success: true,
             data: booking,
@@ -137,7 +192,7 @@ exports.updateBooking = async (req, res, next) => {
             message: 'Cannot update booking',
         });
     }
-}
+};
 
 exports.deleteBooking = async (req, res, next) => {
     try {
