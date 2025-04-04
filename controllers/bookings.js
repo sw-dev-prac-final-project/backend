@@ -79,14 +79,21 @@ exports.addBooking = async (req, res, next) => {
         const userId = req.user.id;
         const existedBooking = await Booking.find({user:userId});
 
-        if(existedBooking >= 3 && req.user.role != 'admin'){
+        if(existedBooking.length >= 3 && req.user.role != 'admin'){
             return res.status(400).json({
                 success: false,
                 message: `The user with ID ${req.user.id} has already made 3 bookings.`,
             });
         }
-        
-        const booking = await Booking.create(req.body);
+
+        const allowedFields = ['apptDate', 'company'];
+        const sanitizedBody = {"user": userId};
+        allowedFields.forEach(field => {
+            if (req.body[field] !== undefined) {
+                sanitizedBody[field] = req.body[field];
+            }
+        });
+        const booking = await Booking.create(sanitizedBody);
         return res.status(201).json({
             success: true,
             data: booking,
