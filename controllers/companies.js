@@ -13,8 +13,7 @@ exports.getCompanies = async (req, res) => {
     let queryStr = JSON.stringify(reqQuery);
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
 
-    // let query = Company.find(JSON.parse(queryStr)).populate("bookings");
-    let query = Company.find(JSON.parse(queryStr));
+    let query = Company.find(JSON.parse(queryStr)).populate("bookings");
 
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");
