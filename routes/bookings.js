@@ -1,5 +1,5 @@
 const express = require("express");
-const  {getBookings, getBooking, addBooking, updateBooking, deleteBooking} = require("../controllers/bookings");
+const  {getBookings, getBooking, addBooking, updateBooking, deleteBooking, getAvailableTimeSlots} = require("../controllers/bookings");
 
 const router = express.Router({mergeParams: true});
 
@@ -8,6 +8,9 @@ const {protect, authorize} = require("../middleware/auth");
 router.route("/")
     .get(protect, authorize("admin", "user"), getBookings)
     .post(protect, authorize("admin", "user"), addBooking);
+
+router.route("/available-slots")
+    .get(protect, authorize("admin", "user"), getAvailableTimeSlots);
 
 router.route("/:id")
     .get(protect, authorize("admin", "user"), getBooking)

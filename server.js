@@ -71,6 +71,7 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 //mount routes
 app.use("/api/v1/companies", companies);
 app.use('/api/v1/bookings', bookings);
+app.use('/api/v1/companies/:companyID/bookings', bookings);
 app.use("/api/v1/auth", auth);
 
 const PORT = process.env.PORT || 5003;
