@@ -139,6 +139,14 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
+    const selectedDateStr = formatDateToYYYYMMDD(apptDate);
+    if (selectedDateStr < '2022-05-10' || selectedDateStr > '2022-05-13') {
+      return res.status(400).json({
+        success: false,
+        error: 'Bookings are only allowed between May 10th and May 13th, 2022'
+      });
+    }
+
     // Check if timeSlot is valid
     const availableTimeSlots = Company.getAvailableTimeSlots();
     if (!availableTimeSlots.includes(timeSlot)) {
@@ -229,6 +237,14 @@ exports.updateBooking = async (req, res, next) => {
     const newApptDate = req.body.apptDate ? new Date(req.body.apptDate) : booking.apptDate;
     const newTimeSlot = req.body.timeSlot || booking.timeSlot;
     const newCompanyId = req.body.company || booking.company.toString();
+
+    const selectedDateStr = formatDateToYYYYMMDD(newApptDate);
+    if (selectedDateStr < '2022-05-10' || selectedDateStr > '2022-05-13') {
+      return res.status(400).json({
+        success: false,
+        error: 'Bookings are only allowed between May 10th and May 13th, 2022'
+      });
+    }
 
     // Check if timeSlot is valid
     const availableTimeSlots = Company.getAvailableTimeSlots();
