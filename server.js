@@ -27,6 +27,14 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('Bad JSON:', err.message);
+    return res.status(400).send({ message: 'Invalid JSON input' });
+  }
+  next();
+});
 app.use(cookieParser());
 
 // security

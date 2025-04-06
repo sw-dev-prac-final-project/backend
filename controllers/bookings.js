@@ -157,7 +157,16 @@ exports.addBooking = async (req, res, next) => {
     }
 
     // Find the company
-    const company = await Company.findById(companyID);
+    let company;
+    try {
+      company = await Company.findById(companyID);
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid company ID',
+      });
+    }
+
     if (!company) {
       return res.status(404).json({
         success: false,
