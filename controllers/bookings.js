@@ -270,22 +270,37 @@ exports.updateBooking = async (req, res, next) => {
     const isTimeSlotChanging = newTimeSlot !== booking.timeSlot;
     
     // Get old and new company
-    const oldCompany = await Company.findById(booking.company);
-    if (!oldCompany) {
+    let oldCompany;
+    try {
+      oldCompany = await Company.findById(booking.company);
+      if (!oldCompany) {
       return res.status(404).json({
         success: false,
         error: 'Original company not found',
+      });
+      }
+    } catch (error) {
+      return res.status(400).json({
+      success: false,
+      error: 'Invalid original company ID',
       });
     }
     
     let newCompany = oldCompany;
     if (isCompanyChanging) {
+      try {
       newCompany = await Company.findById(newCompanyId);
       if (!newCompany) {
         return res.status(404).json({
-          success: false,
-          error: 'New company not found',
+        success: false,
+        error: 'New company not found',
         });
+      }
+      } catch (error) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid new company ID',
+      });
       }
     }
     
