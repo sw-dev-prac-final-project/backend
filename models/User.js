@@ -30,13 +30,7 @@ const UserSchema = new mongoose.Schema({
         required:[true,'Please add an telephone number'],
         minlength:9,
         maxlength:10,
-        unique : true,
-        validate: {
-            validator: function (v) {
-              return /^\d{10}$/.test(v); // Exactly 10 digits
-            },
-            message: props => `${props.value} is not a valid telephone number!`,
-          },
+        unique : true
     },
     resetPasswordToken : String,
     resetPasswordExpire : Date,
