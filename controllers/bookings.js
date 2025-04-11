@@ -209,7 +209,7 @@ exports.addBooking = async (req, res, next) => {
     await company.save();
 
     // Send confirmation email
-    // await sendConfirmationEmail(req.user.email, req.user.name, booking, company);
+    await sendConfirmationEmail(req.user.email, req.user.name, booking, company);
 
     return res.status(201).json({
       success: true,
@@ -340,6 +340,8 @@ exports.updateBooking = async (req, res, next) => {
       new: true,
       runValidators: true,
     });
+
+    await sendConfirmationEmail(req.user.email, req.user.name, booking, newCompany);
 
     return res.status(200).json({
       success: true,
