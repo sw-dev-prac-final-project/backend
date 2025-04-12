@@ -17,7 +17,7 @@ const sendConfirmationEmail = async (userEmail, userName, booking, company) => {
             <p>Dear ${userName},</p>
             <p>Your interview has been successfully booked with <strong>${company.name}</strong>.</p>
             <ul>
-                <li><strong>Date:</strong> ${booking.apptDate}</li>
+                <li><strong>Date:</strong> ${booking.apptDate}, ${booking.timeSlot}</li>
                 <li><strong>Location:</strong> ${company.address}</li>
                 <li><strong>Contact:</strong> ${company.tel}</li>
                 <li><strong>Website:</strong> <a href="${company.website}">${company.website}</a></li>

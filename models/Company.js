@@ -32,6 +32,10 @@ const CompanySchema = new mongoose.Schema({
     trim: true,
     maxlength: [50, 'Name cannot be more than 50 characters']
   },
+  description: {
+    type: String,
+    maxlength: [500, 'Description cannot be more than 500 characters']
+  },
   address: {
     type: String,
     required: [true, 'Please add an address']
