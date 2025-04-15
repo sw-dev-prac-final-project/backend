@@ -1,0 +1,115 @@
+@startuml booking
+actor User
+participant "Frontend" as FE
+participant "<<router>>\n bookings" as Router
+participant "<<middleware>>\nAuth" as Auth
+participant "<<controllers>>\n Company" as Controller
+participant "<<models>>\nBooking" as Booking
+participant "<<models>>\nCompany" as Company
+
+group getBookings
+User -> FE : Visit bookings page
+FE -> Router : GET /api/bookings
+Router -> Auth : validate JWT
+Auth --> Router : req.user
+Router -> Controller : getBookings(req)
+Controller -> Booking : Booking.find({ user: req.user.id })
+Booking --> Controller : list of bookings
+Controller --> Router : res.json(bookings)
+Router --> FE : show bookings
+end
+
+== ==
+
+group getBooking
+User -> FE : Click on a booking
+FE -> Router : GET /api/bookings/:id
+Router -> Auth : validate JWT
+Router -> Controller : getBooking(req)
+Controller -> Booking : findById(req.params.id)
+Booking --> Controller : booking
+Controller --> Router : res.json(booking)
+Router --> FE : show booking details
+end
+
+== ==
+
+group addBooking
+User -> FE : Fill booking form
+FE -> Router : POST /api/bookings
+Router -> Auth : validate JWT
+Router -> Controller : addBooking(req)
+
+Controller -> Company : findById(req.body.company)
+Company --> Controller : company doc
+
+Controller -> Company : check bookedSlots for date
+alt slot available
+  Controller -> Booking : create({ user, company, timeSlot })
+  Booking --> Controller : booking created
+  Controller -> Company : push to company.bookedSlots[]
+  Company --> Controller : updated
+  Controller --> Router : res.status(201).json(booking)
+else slot not available
+  Controller --> Router : res.status(400).json(error)
+end
+Router --> FE : show result
+end
+
+== ==
+
+group updateBooking
+User -> FE : Update booking info
+FE -> Router : PUT /api/bookings/:id
+Router -> Auth : validate JWT
+Router -> Controller : updateBooking(req)
+
+Controller -> Booking : findById(req.params.id)
+Booking --> Controller : existing booking
+alt booking found
+  Controller -> Booking : findByIdAndUpdate(...)
+  Booking --> Controller : updated booking
+  Controller --> Router : res.json(updated)
+else not found
+  Controller --> Router : 404 error
+end
+Router --> FE : show result
+end
+
+== ==
+
+group deleteBooking
+User -> FE : Delete booking
+FE -> Router : DELETE /api/bookings/:id
+Router -> Auth : validate JWT
+Router -> Controller : deleteBooking(req)
+
+Controller -> Booking : findById(req.params.id)
+Booking --> Controller : booking
+alt found
+  Controller -> Booking : deleteOne({ _id: id })
+  Controller --> Router : res.json(success)
+else not found
+  Controller --> Router : 404 error
+end
+Router --> FE : show result
+end
+
+== ==
+
+group getAvailableTimeSlots
+User -> FE : Select company to view slots
+FE -> Router : GET /api/bookings/available-slots?companyId=...&date=...
+Router -> Auth : validate JWT
+Router -> Controller : getAvailableTimeSlots(req)
+
+Controller -> Company : findById(req.query.companyId)
+Company --> Controller : company
+
+Controller -> Company : filter bookedSlots by date
+Controller -> Company : Company.getAvailableTimeSlots()
+Controller --> Router : res.json(availableSlots)
+Router --> FE : show slot availability
+end
+
+@enduml

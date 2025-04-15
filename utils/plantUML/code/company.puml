@@ -1,0 +1,92 @@
+@startuml company
+actor User
+actor Admin
+participant "Frontend" as FE
+participant "<<router>>\n companies" as Router
+participant "<<middleware>>\nAuth" as Auth
+participant "<<controllers>>\n Company" as Controller
+participant "<<models>>\nCompany" as CompanyModel
+
+group getCompanies
+User -> FE : Visit company list page
+FE -> Router : GET /api/companies
+Router -> Auth : validate JWT + authorize
+Auth --> Router : req.user
+Router -> Controller : getCompanies(req)
+Controller -> CompanyModel : find()
+CompanyModel --> Controller : companies
+Controller --> Router : res.json(companies)
+Router --> FE : show list
+end
+
+== ==
+
+group getCompany
+User -> FE : View company detail
+FE -> Router : GET /api/companies/:id
+Router -> Auth : validate JWT + authorize
+Router -> Controller : getCompany(req)
+Controller -> CompanyModel : findById(req.params.id)
+CompanyModel --> Controller : company
+Controller --> Router : res.json(company)
+Router --> FE : show company detail
+end
+
+== ==
+
+group addCompany
+Admin -> FE : Fill add company form
+FE -> Router : POST /api/companies
+Router -> Auth : validate JWT + authorize("admin")
+Auth --> Router : req.user (admin)
+Router -> Controller : addCompany(req)
+Controller -> CompanyModel : create(req.body)
+CompanyModel --> Controller : new company
+Controller --> Router : res.status(201).json(company)
+Router --> FE : show success
+end
+
+== ==
+
+group updateCompany
+Admin -> FE : Edit company
+FE -> Router : PUT /api/companies/:id
+Router -> Auth : validate JWT + authorize("admin")
+Auth --> Router : req.user (admin)
+Router -> Controller : updateCompany(req)
+Controller -> CompanyModel : findByIdAndUpdate(id, body)
+CompanyModel --> Controller : updated company
+Controller --> Router : res.json(company)
+Router --> FE : show update result
+end
+
+== ==
+
+group deleteCompany
+Admin -> FE : Delete company
+FE -> Router : DELETE /api/companies/:id
+Router -> Auth : validate JWT + authorize("admin")
+Auth --> Router : req.user (admin)
+Router -> Controller : deleteCompany(req)
+Controller -> CompanyModel : findByIdAndDelete(req.params.id)
+CompanyModel --> Controller : deleted
+Controller --> Router : res.json(success)
+Router --> FE : show result
+end
+
+== ==
+
+group getCompanyTimeSlots
+User -> FE : View time slots for company
+FE -> Router : GET /api/companies/:id/timeslots
+Router -> Auth : validate JWT + authorize
+Auth --> Router : req.user
+Router -> Controller : getCompanyTimeSlots(req)
+Controller -> CompanyModel : findById(req.params.id)
+CompanyModel --> Controller : company
+Controller -> CompanyModel : extract available time slots
+Controller --> Router : res.json(slots)
+Router --> FE : show available time slots
+end
+
+@enduml
