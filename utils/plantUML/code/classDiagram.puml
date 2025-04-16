@@ -1,4 +1,4 @@
-@startuml
+@startuml classDiagram
 
 ' Define classes
 class Booking {
@@ -38,9 +38,9 @@ class User {
 }
 
 ' Relationships
-Company "1" *-- "0..*" BookedSlot
-Company "1" o-- "0..*" Booking : bookings
-Booking "1" --> "1" Company
-Booking "1" --> "1" User
+BookedSlot "0..*" --> "1" Company
+
+Booking "0..*" --> "1" Company
+Booking "0..3" --> "1" User
 
 @enduml
