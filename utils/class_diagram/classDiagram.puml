@@ -1,0 +1,46 @@
+@startuml
+
+' Define classes
+class Booking {
+  +Date apptDate
+  +String timeSlot
+  +ObjectId company
+  +ObjectId user
+  +Date createdAt
+}
+
+class Company {
+  +String name
+  +String description
+  +String address
+  +String website
+  +String tel
+  +List<BookedSlot> bookedSlots
+  +static List<String> getAvailableTimeSlots()
+}
+
+class BookedSlot {
+  +Date date
+  +String timeSlot
+}
+
+class User {
+  +String name
+  +String email
+  +String role
+  +String password
+  +String tel
+  +String resetPasswordToken
+  +Date resetPasswordExpire
+  +Date createdAt
+  +getSignedJwtToken()
+  +matchPassword(enteredPassword)
+}
+
+' Relationships
+Company "1" *-- "0..*" BookedSlot
+Company "1" o-- "0..*" Booking : bookings
+Booking "1" --> "1" Company
+Booking "1" --> "1" User
+
+@enduml
