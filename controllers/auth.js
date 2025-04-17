@@ -29,13 +29,18 @@ exports.register = async (req, res, next) => {
     const { name, tel, email, password, role } = req.body;
 
     //create user
-    const user = await User.create({
+    let user;
+    try {
+      user = await User.create({
       name,
       email,
       password,
       role,
       tel,
-    });
+      });
+    } catch (err) {
+      return res.status(400).json({ success: false, msg: err.message || "Error creating user" });
+    }
 
     sendTokenResponse(user, 200, res);
   } catch (err) {
@@ -107,10 +112,18 @@ exports.logout  = async (req, res, next) => {
 }
 
 exports.updateProfile = async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.user.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  try {
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-  sendTokenResponse(user, 200, res);
+    if (!user) {
+      return res.status(404).json({ success: false, msg: "User not found" });
+    }
+
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    res.status(400).json({ success: false, msg: err.message || "Error updating profile" });
+  }
 }
