@@ -9,7 +9,7 @@ participant "<<models>>\nCompany" as CompanyModel
 
 group getCompanies
 User -> FE : Visit company list page
-FE -> Router : GET /api/companies
+FE -> Router : GET /api/v1/companies
 Router -> Auth : validate JWT + authorize
 Auth --> Router : req.user
 Router -> Controller : getCompanies(req)
@@ -23,7 +23,7 @@ end
 
 group getCompany
 User -> FE : View company detail
-FE -> Router : GET /api/companies/:id
+FE -> Router : GET /api/v1/companies/:id
 Router -> Auth : validate JWT + authorize
 Router -> Controller : getCompany(req)
 Controller -> CompanyModel : findById(req.params.id)
@@ -36,7 +36,7 @@ end
 
 group addCompany
 Admin -> FE : Fill add company form
-FE -> Router : POST /api/companies
+FE -> Router : POST /api/v1/companies
 Router -> Auth : validate JWT + authorize("admin")
 Auth --> Router : req.user (admin)
 Router -> Controller : addCompany(req)
@@ -50,7 +50,7 @@ end
 
 group updateCompany
 Admin -> FE : Edit company
-FE -> Router : PUT /api/companies/:id
+FE -> Router : PUT /api/v1/companies/:id
 Router -> Auth : validate JWT + authorize("admin")
 Auth --> Router : req.user (admin)
 Router -> Controller : updateCompany(req)
@@ -64,7 +64,7 @@ end
 
 group deleteCompany
 Admin -> FE : Delete company
-FE -> Router : DELETE /api/companies/:id
+FE -> Router : DELETE /api/v1/companies/:id
 Router -> Auth : validate JWT + authorize("admin")
 Auth --> Router : req.user (admin)
 Router -> Controller : deleteCompany(req)
@@ -78,7 +78,7 @@ end
 
 group getCompanyTimeSlots
 User -> FE : View time slots for company
-FE -> Router : GET /api/companies/:id/timeslots
+FE -> Router : GET /api/v1/companies/:id/timeslots
 Router -> Auth : validate JWT + authorize
 Auth --> Router : req.user
 Router -> Controller : getCompanyTimeSlots(req)

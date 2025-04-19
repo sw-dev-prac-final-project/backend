@@ -8,7 +8,7 @@ participant "<<models>>\nUser" as UserModel
 
 group register
 User -> FE : Fill register form
-FE -> Router : POST /api/auth/register
+FE -> Router : POST /api/v1/auth/register
 Router -> Controller : register(req)
 Controller -> UserModel : create({ name, email, password, tel, role })
 UserModel --> Controller : created user
@@ -22,7 +22,7 @@ end
 
 group login
 User -> FE : Fill login form
-FE -> Router : POST /api/auth/login
+FE -> Router : POST /api/v1/auth/login
 Router -> Controller : login(req)
 Controller -> UserModel : findOne({ email }).select("+password")
 UserModel --> Controller : user doc
@@ -41,7 +41,7 @@ end
 
 group getMe
 User -> FE : Go to profile
-FE -> Router : GET /api/auth/me
+FE -> Router : GET /api/v1/auth/me
 Router -> Auth : validate JWT
 Auth --> Router : req.user
 Router -> Controller : getMe(req)
@@ -55,7 +55,7 @@ end
 
 group logout
 User -> FE : Click logout
-FE -> Router : GET /api/auth/logout
+FE -> Router : GET /api/v1/auth/logout
 Router -> Controller : logout(req)
 Controller -> Router : res.cookie("token", "none", { expires })
 Router --> FE : clear token and redirect
@@ -65,7 +65,7 @@ end
 
 group updateProfile
 User -> FE : Edit profile
-FE -> Router : PUT /api/auth/updateProfile
+FE -> Router : PUT /api/v1/auth/updateProfile
 Router -> Auth : validate JWT
 Auth --> Router : req.user
 Router -> Controller : updateProfile(req)

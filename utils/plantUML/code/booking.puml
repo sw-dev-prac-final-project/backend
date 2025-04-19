@@ -9,7 +9,7 @@ participant "<<models>>\nCompany" as Company
 
 group getBookings
 User -> FE : Visit bookings page
-FE -> Router : GET /api/bookings
+FE -> Router : GET /api/v1/bookings
 Router -> Auth : validate JWT
 Auth --> Router : req.user
 Router -> Controller : getBookings(req)
@@ -23,7 +23,7 @@ end
 
 group getBooking
 User -> FE : Click on a booking
-FE -> Router : GET /api/bookings/:id
+FE -> Router : GET /api/v1/bookings/:id
 Router -> Auth : validate JWT
 Router -> Controller : getBooking(req)
 Controller -> Booking : findById(req.params.id)
@@ -36,7 +36,7 @@ end
 
 group addBooking
 User -> FE : Fill booking form
-FE -> Router : POST /api/bookings
+FE -> Router : POST /api/v1/bookings
 Router -> Auth : validate JWT
 Router -> Controller : addBooking(req)
 
@@ -60,7 +60,7 @@ end
 
 group updateBooking
 User -> FE : Update booking info
-FE -> Router : PUT /api/bookings/:id
+FE -> Router : PUT /api/v1/bookings/:id
 Router -> Auth : validate JWT
 Router -> Controller : updateBooking(req)
 
@@ -80,7 +80,7 @@ end
 
 group deleteBooking
 User -> FE : Delete booking
-FE -> Router : DELETE /api/bookings/:id
+FE -> Router : DELETE /api/v1/bookings/:id
 Router -> Auth : validate JWT
 Router -> Controller : deleteBooking(req)
 
@@ -99,7 +99,7 @@ end
 
 group getAvailableTimeSlots
 User -> FE : Select company to view slots
-FE -> Router : GET /api/bookings/available-slots?companyId=...&date=...
+FE -> Router : GET /api/v1/bookings/available-slots?companyId=...&date=...
 Router -> Auth : validate JWT
 Router -> Controller : getAvailableTimeSlots(req)
 
