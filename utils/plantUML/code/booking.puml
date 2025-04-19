@@ -3,7 +3,7 @@ actor User
 participant "Frontend" as FE
 participant "<<router>>\n bookings" as Router
 participant "<<middleware>>\nAuth" as Auth
-participant "<<controllers>>\n Company" as Controller
+participant "<<controllers>>\n Booking" as Controller
 participant "<<models>>\nBooking" as Booking
 participant "<<models>>\nCompany" as Company
 participant "<<mongoDB>>\nBooking" as MongoDB_Booking
@@ -51,16 +51,16 @@ Company -> MongoDB_Company : Query company by ID
 MongoDB_Company --> Company : company doc
 Company --> Controller : company doc
 
-Controller -> Company : check bookedSlots for date
+Controller -> Booking : check bookedSlots for date
 alt slot available
   Controller -> Booking : create({ user, company, timeSlot })
   Booking -> MongoDB_Booking : Insert booking
   MongoDB_Booking --> Booking : booking created
   Booking --> Controller : booking created
-  Controller -> Company : push to company.bookedSlots[]
-  Company -> MongoDB_Company : Update bookedSlots
-  MongoDB_Company --> Company : updated
-  Company --> Controller : updated
+  Controller -> Booking : push to bookedSlots[]
+  Booking -> MongoDB_Booking : Update bookedSlots
+  MongoDB_Booking --> Booking : updated
+  Booking --> Controller : updated
   Controller --> Router : res.status(201).json(booking)
 else slot not available
   Controller --> Router : res.status(400).json(error)
@@ -128,8 +128,8 @@ Company -> MongoDB_Company : Query company by ID
 MongoDB_Company --> Company : company
 Company --> Controller : company
 
-Controller -> Company : filter bookedSlots by date
-Controller -> Company : Company.getAvailableTimeSlots()
+Controller -> Booking : filter bookedSlots by date
+Controller -> Booking : Booking.getAvailableTimeSlots()
 Controller --> Router : res.json(availableSlots)
 Router --> FE : show slot availability
 end
