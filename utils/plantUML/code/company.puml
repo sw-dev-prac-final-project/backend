@@ -6,6 +6,7 @@ participant "<<router>>\n companies" as Router
 participant "<<middleware>>\nAuth" as Auth
 participant "<<controllers>>\n Company" as Controller
 participant "<<models>>\nCompany" as CompanyModel
+participant "<<MongoDB>>\nCompanies" as CompaniesDB
 
 group getCompanies
 User -> FE : Visit company list page
@@ -14,6 +15,8 @@ Router -> Auth : validate JWT + authorize
 Auth --> Router : req.user
 Router -> Controller : getCompanies(req)
 Controller -> CompanyModel : find()
+CompanyModel -> CompaniesDB : Query companies
+CompaniesDB --> CompanyModel : companies
 CompanyModel --> Controller : companies
 Controller --> Router : res.json(companies)
 Router --> FE : show list
@@ -25,8 +28,11 @@ group getCompany
 User -> FE : View company detail
 FE -> Router : GET /api/v1/companies/:id
 Router -> Auth : validate JWT + authorize
+Auth --> Router : req.user
 Router -> Controller : getCompany(req)
 Controller -> CompanyModel : findById(req.params.id)
+CompanyModel -> CompaniesDB : Query company by ID
+CompaniesDB --> CompanyModel : company
 CompanyModel --> Controller : company
 Controller --> Router : res.json(company)
 Router --> FE : show company detail
@@ -41,6 +47,8 @@ Router -> Auth : validate JWT + authorize("admin")
 Auth --> Router : req.user (admin)
 Router -> Controller : addCompany(req)
 Controller -> CompanyModel : create(req.body)
+CompanyModel -> CompaniesDB : Insert new company
+CompaniesDB --> CompanyModel : new company
 CompanyModel --> Controller : new company
 Controller --> Router : res.status(201).json(company)
 Router --> FE : show success
@@ -55,6 +63,8 @@ Router -> Auth : validate JWT + authorize("admin")
 Auth --> Router : req.user (admin)
 Router -> Controller : updateCompany(req)
 Controller -> CompanyModel : findByIdAndUpdate(id, body)
+CompanyModel -> CompaniesDB : Update company by ID
+CompaniesDB --> CompanyModel : updated company
 CompanyModel --> Controller : updated company
 Controller --> Router : res.json(company)
 Router --> FE : show update result
@@ -69,6 +79,8 @@ Router -> Auth : validate JWT + authorize("admin")
 Auth --> Router : req.user (admin)
 Router -> Controller : deleteCompany(req)
 Controller -> CompanyModel : findByIdAndDelete(req.params.id)
+CompanyModel -> CompaniesDB : Delete company by ID
+CompaniesDB --> CompanyModel : deleted
 CompanyModel --> Controller : deleted
 Controller --> Router : res.json(success)
 Router --> FE : show result
@@ -83,10 +95,10 @@ Router -> Auth : validate JWT + authorize
 Auth --> Router : req.user
 Router -> Controller : getCompanyTimeSlots(req)
 Controller -> CompanyModel : findById(req.params.id)
+CompanyModel -> CompaniesDB : Query company by ID
+CompaniesDB --> CompanyModel : company
 CompanyModel --> Controller : company
 Controller -> CompanyModel : extract available time slots
 Controller --> Router : res.json(slots)
 Router --> FE : show available time slots
 end
-
-@enduml
