@@ -180,14 +180,12 @@ exports.getCompanyTimeSlots = async (req, res) => {
     try {
         const { id } = req.params;
         const { date } = req.query;
-        
         if (!date) {
             return res.status(400).json({
                 success: false,
                 message: 'Please provide a date parameter'
             });
         }
-        
         const company = await Company.findById(id);
         if (!company) {
             return res.status(404).json({
@@ -195,21 +193,16 @@ exports.getCompanyTimeSlots = async (req, res) => {
                 message: `Company not found with id of ${id}`
             });
         }
-        
         // Format the date for comparison
         const formattedQueryDate = new Date(date).toISOString().split('T')[0];
-        
         // Get all available time slots
         const allTimeSlots = Company.getAvailableTimeSlots();
-        
         // Find booked slots for the given date
         const bookedSlots = company.bookedSlots
             .filter(slot => new Date(slot.date).toISOString().split('T')[0] === formattedQueryDate)
             .map(slot => slot.timeSlot);
-        
         // Get available slots (all slots minus booked slots)
         const availableSlots = allTimeSlots.filter(slot => !bookedSlots.includes(slot));
-        
         res.status(200).json({
             success: true,
             data: {
