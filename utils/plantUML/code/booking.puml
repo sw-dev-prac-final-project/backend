@@ -6,7 +6,6 @@ participant "<<middleware>>\nAuth" as Auth
 participant "<<controllers>>\n Booking" as Controller
 participant "<<models>>\nBooking" as Booking
 participant "<<models>>\nCompany" as Company
-participant "<<utils>>\nEmail" as Email
 participant "<<mongoDB>>\nBooking" as MongoDB_Booking
 participant "<<mongoDB>>\nCompany" as MongoDB_Company
 
@@ -16,20 +15,27 @@ FE -> Router : GET /api/v1/bookings
 Router -> Auth : validate JWT
 Auth --> Router : req.user
 Router -> Controller : getBookings(req)
-alt user is not admin
-  Controller -> Booking : find({ user: req.user.id }).populate(company)
-else user is admin
-  alt req.params.companyID exists
-    Controller -> Booking : find({ company: id }).populate(company)
-  else no filter
-    Controller -> Booking : find().populate(company)
-  end
-end
+Controller -> Booking : Booking.find({ user: req.user.id })
 Booking -> MongoDB_Booking : Query bookings
-MongoDB_Booking --> Booking : bookings
-Booking --> Controller : bookings
+MongoDB_Booking --> Booking : list of bookings
+Booking --> Controller : list of bookings
 Controller --> Router : res.json(bookings)
 Router --> FE : show bookings
+end
+
+== ==
+
+group getBooking
+User -> FE : Click on a booking
+FE -> Router : GET /api/v1/bookings/:id
+Router -> Auth : validate JWT
+Router -> Controller : getBooking(req)
+Controller -> Booking : findById(req.params.id)
+Booking -> MongoDB_Booking : Query booking by ID
+MongoDB_Booking --> Booking : booking
+Booking --> Controller : booking
+Controller --> Router : res.json(booking)
+Router --> FE : show booking details
 end
 
 == ==
@@ -40,31 +46,24 @@ FE -> Router : POST /api/v1/bookings
 Router -> Auth : validate JWT
 Router -> Controller : addBooking(req)
 
-Controller -> Company : findById(companyID)
+Controller -> Company : findById(req.body.company)
 Company -> MongoDB_Company : Query company by ID
 MongoDB_Company --> Company : company doc
-alt slot already booked or invalid date/slot
+Company --> Controller : company doc
+
+Controller -> Booking : check bookedSlots for date
+alt slot available
+  Controller -> Booking : create({ user, company, timeSlot })
+  Booking -> MongoDB_Booking : Insert booking
+  MongoDB_Booking --> Booking : booking created
+  Booking --> Controller : booking created
+  Controller -> Booking : push to bookedSlots[]
+  Booking -> MongoDB_Booking : Update bookedSlots
+  MongoDB_Booking --> Booking : updated
+  Booking --> Controller : updated
+  Controller --> Router : res.status(201).json(booking)
+else slot not available
   Controller --> Router : res.status(400).json(error)
-else check user booking limit
-  Controller -> Booking : find({ user: id })
-  Booking -> MongoDB_Booking : query by user ID
-  MongoDB_Booking --> Booking : bookings[]
-  alt exceeded
-    Controller --> Router : res.status(400).json(error)
-  else create booking
-    Controller -> Booking : create({...})
-    Booking -> MongoDB_Booking : insert new booking
-    MongoDB_Booking --> Booking : success
-    Booking --> Controller : booking
-
-    Controller -> Company : update bookedSlots
-    Company -> MongoDB_Company : push slot to bookedSlots[]
-    MongoDB_Company --> Company : updated
-
-    Controller -> Email : sendConfirmationEmail()
-    Email --> Controller : sent
-    Controller --> Router : res.status(201).json(booking)
-  end
 end
 Router --> FE : show result
 end
@@ -76,25 +75,42 @@ User -> FE : Update booking info
 FE -> Router : PUT /api/v1/bookings/:id
 Router -> Auth : validate JWT
 Router -> Controller : updateBooking(req)
-Controller -> Booking : findById(id)
-Booking -> MongoDB_Booking : query
+
+Controller -> Booking : findById(req.params.id)
+Booking -> MongoDB_Booking : Query booking by ID
 MongoDB_Booking --> Booking : existing booking
-alt not owner and not admin
-  Controller --> Router : res.status(401)
-else continue
-  Controller -> Company : findById(oldCompany)
-  Controller -> Company : findById(newCompany)
-  Controller -> Company : check isSlotBooked()
-  alt slot not available
-    Controller --> Router : 400 error
-  else
-    Controller -> Company : remove old slot from oldCompany.bookedSlots
-    Controller -> Company : add new slot to newCompany.bookedSlots
-    Controller -> Booking : findByIdAndUpdate(...)
-    Booking -> MongoDB_Booking : update booking
-    MongoDB_Booking --> Booking : updated
-    Controller --> Router : res.json(updated)
-  end
+Booking --> Controller : existing booking
+alt booking found
+  Controller -> Booking : findByIdAndUpdate(...)
+  Booking -> MongoDB_Booking : Update booking
+  MongoDB_Booking --> Booking : updated booking
+  Booking --> Controller : updated booking
+  Controller --> Router : res.json(updated)
+else not found
+  Controller --> Router : 404 error
+end
+Router --> FE : show result
+end
+
+== ==
+
+group deleteBooking
+User -> FE : Delete booking
+FE -> Router : DELETE /api/v1/bookings/:id
+Router -> Auth : validate JWT
+Router -> Controller : deleteBooking(req)
+
+Controller -> Booking : findById(req.params.id)
+Booking -> MongoDB_Booking : Query booking by ID
+MongoDB_Booking --> Booking : booking
+Booking --> Controller : booking
+alt found
+  Controller -> Booking : deleteOne({ _id: id })
+  Booking -> MongoDB_Booking : Delete booking
+  MongoDB_Booking --> Booking : success
+  Controller --> Router : res.json(success)
+else not found
+  Controller --> Router : 404 error
 end
 Router --> FE : show result
 end
@@ -102,17 +118,18 @@ end
 == ==
 
 group getAvailableTimeSlots
-User -> FE : Select company + date
-FE -> Router : GET /api/v1/bookings/available-slots
+User -> FE : Select company to view slots
+FE -> Router : GET /api/v1/bookings/available-slots?companyId=...&date=...
 Router -> Auth : validate JWT
 Router -> Controller : getAvailableTimeSlots(req)
 
-Controller -> Company : findById(companyId)
-Company -> MongoDB_Company : query
+Controller -> Company : findById(req.query.companyId)
+Company -> MongoDB_Company : Query company by ID
 MongoDB_Company --> Company : company
-Controller -> Company : getAvailableTimeSlots()
-Controller -> Company : filter out bookedSlots by date
+Company --> Controller : company
+
+Controller -> Booking : filter bookedSlots by date
+Controller -> Booking : Booking.getAvailableTimeSlots()
 Controller --> Router : res.json(availableSlots)
 Router --> FE : show slot availability
 end
-@enduml
