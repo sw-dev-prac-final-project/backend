@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "b72a4f27-3aeb-4ea8-99d7-5b07db47f495",
-		"name": "test all",
+		"name": "00.test all",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "41349865",
 		"_collection_link": "https://punveerapat.postman.co/workspace/sw-dev-prac-final-project~8c1c7a10-1377-44d2-ad31-81c85e2c5912/collection/41349865-b72a4f27-3aeb-4ea8-99d7-5b07db47f495?action=share&source=collection_link&creator=41349865"
@@ -30,7 +30,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\" : \"Admin\",\r\n    \"email\" : \"{{$randomFullName}}@gmail.com\",\r\n    \"password\" : \"123456\",\r\n    \"role\": \"admin\",\r\n    \"tel\" : \"0888888888\"\r\n}",
+					"raw": "{\r\n    \"name\" : \"Admin\",\r\n    \"email\" : \"{{$randomFirstName}}@gmail.com\",\r\n    \"password\" : \"123456\",\r\n    \"role\": \"admin\",\r\n    \"tel\" : \"0888888888\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -82,7 +82,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\" : \"Mes\",\r\n    \"email\" : \"{{$randomFullName}}@gmail.com\",\r\n    \"password\" : \"123456\",\r\n    \"tel\" : \"0888888888\"\r\n}",
+					"raw": "{\r\n    \"name\" : \"Mes\",\r\n    \"email\" : \"{{$randomFirstName}}@gmail.com\",\r\n    \"password\" : \"123456\",\r\n    \"tel\" : \"0888888888\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -475,7 +475,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/api/v1/auth/updateProfile",
+					"raw": "{{base_url}}/api/v1/auth/",
 					"host": [
 						"{{base_url}}"
 					],
@@ -483,7 +483,7 @@
 						"api",
 						"v1",
 						"auth",
-						"updateProfile"
+						""
 					]
 				},
 				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
@@ -1349,7 +1349,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"{{$randomFullName}}\",\n    \"address\": \"{{$randomStreetAddress}}\",\n    \"website\": \"Pun.com\",\n    \"tel\": \"0883999461\"\n}",
+					"raw": "{\n\t\"name\": \"{{$randomFullName}}\",\n    \"address\": \"{{$randomStreetAddress}}\",\n    \"description\":\"{{$randomJobDescriptor}}\",\n    \"website\": \"Pun.com\",\n    \"tel\": \"0883999461\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1730,7 +1730,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"{{$randomFullName}}\",\n    \"address\": \"{{$randomStreetAddress}}\",\n    \"website\": \"Pun.com\",\n    \"tel\": \"0883999461\"\n}",
+					"raw": "{\n\t\"name\": \"{{$randomFullName}}\",\n    \"address\": \"{{$randomStreetAddress}}\",\n    \"description\":\"{{$randomJobDescriptor}}\",\n    \"website\": \"Pun.com\",\n    \"tel\": \"0883999461\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1914,6 +1914,50 @@
 				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "NEWCOM",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "NEWBOOK",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
